@@ -1,4 +1,4 @@
-/* 2016.5.26 16050272 门店活动分析 */
+/* 2016.5.26 */
 $orange: #fd9601;
 $borderColor: #E1E1E1;
 @mixin norm($size:12px){
@@ -7,6 +7,11 @@ $borderColor: #E1E1E1;
 }
 .ovh{overflow:hidden;}
 .clear{clear:both;}
+.ell{
+	overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
 .area-select{
 	position:relative;
 	.select-data{
@@ -104,8 +109,18 @@ $borderColor: #E1E1E1;
 			.date-selector{
 				min-width: 72px;
 				width: 76px;
+				height: 18px;
 			}
 			&.compare{margin-left:3px;}
+		}
+		button{
+			margin-left: 20px;
+			padding: 0 30px;
+			background-color: $orange;
+			border: none;
+			line-height: 22px;
+			color: #fff;
+			cursor: pointer;
 		}
 	}
 	.tips{
@@ -120,21 +135,56 @@ $borderColor: #E1E1E1;
 	}
 	.second-title{
 		h2{
-			padding: 30px;
 			font-size: 20px;
 			font-weight: normal;
+			&.sub-title{
+				padding: 25px 30px;
+			}
 		}
 		.title-tabs{
-			overflow: hidden;
-			border-bottom: solid 2px $orange;
+			height: 140px;
 			li{
 				float: left;
-				margin-left: 30px;
-				width: 45.5%;
+				margin-left: 24px;
+				width: 46.5%;
+				height: 100%;
+				background-color: #FFF;
 				border: solid 2px $borderColor;
 				border-bottom: none;
-				text-align: center;
+				a{display:block;
+				padding: 24px;}
+				&.active{
+					border-color: $orange;
+    				height: 142px;
+				}
 			}
+			h2{				
+				span{
+				    margin-left: 15px;
+					vertical-align: top;
+					font-size: 42px;
+    				line-height: 1;
+				}
+			}
+			p{
+				margin: 15px 0 0 98px;
+				.percent{
+					display: inline-block;
+					margin-right: 20px;
+				}
+				.num{
+					font-size: 24px;
+				}
+			}
+		}
+		.content-wrap{
+
+			border-top: solid 2px $orange;
+		}
+
+		/*图表*/
+		#chart{
+			height: 540px;
 		}
 	}
 }
