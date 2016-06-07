@@ -18,7 +18,15 @@
 			this.init.call(this, selector, context); //替换this对象
 			return this;
 		},
-		_sClass = 'area-select';
+		_sClass = 'area-select',
+		d = document,
+		jq = $.fn;
+	jq.extend({
+		A: jq.addClass,
+		C: jq.children,
+		R: jq.removeClass,
+		P: jq.append
+	});
 	areaSelect.prototype = {
 		constructor: areaSelect,
 		init: function(selector, context) {
@@ -29,12 +37,12 @@
 			//优先使用设置的data属性
 			if (options.data.length) {
 				_init(selector, options.data);
-				_bindEvents.call(that);
+				_bindEvents.call(that, selector);
 				options.onLoad();
 			} else {
-				if ($.trim(options.url) != '') {
+				if ($.trim(options.url) !== '') {
 					$.when(_request.call(that, selector)).done(function() {
-						_bindEvents.call(that);
+						_bindEvents.call(that, selector);
 						options.onLoad();
 					});
 				} else console.log('Data error: there is no data here.');
@@ -44,37 +52,37 @@
 		getSelectedCodes: function() {
 			return this.selectedCodes;
 		}
-	}
+	};
 	$.fn.areaSelect = function() {
 		var _self = this,
 			args = Array.prototype.slice.call(arguments);
-		_self.addClass(_sClass);
+		_self.A(_sClass);
 		return new areaSelect(_self, args[0]);
 	};
 
 	function _init(selector, source) {
-		var $v = $('<div class="select-data">'),
+		var $v = $.create('div', 'select-data'),
 			data = source;
-		selector.append($v);
+		selector.P($v);
 		if (data.length) {
 			var $w = $.create('div', 'select-wrap clear'),
 				$u = $.create('ul', 'select-tabs');
-			selector.append($w.append($u));
+			selector.P($w.P($u));
 
 			//初始化结果区域（默认第一条数据）
 			var def = data[0];
 			_initDefault($v, $u, def);
 			//默认首个选项激活状态
-			$u.children().eq(0).addClass('active');
+			$u.C().eq(0).A('active');
 
 			//初始化展开的选择区域
 			var $c = $.create('div', 'select-content clear');
-			$w.append($c);
+			$w.P($c);
 			_initContent($c, source);
 			//默认显示首个选择区域
-			$c.children().eq(0).show();
+			$c.C().eq(0).show();
 		}
-		$v.append('<i class="triangle"></i>');
+		$v.P('<i class="triangle"></i>');
 
 		function _initDefault(child1, child2, def) {
 			var $s = $('<span>'),
@@ -82,28 +90,28 @@
 				_h = ['<a href="javascript:"><span>', def.name, '</span><i class="triangle"> </i>', '</a>'];
 			$s.html(def.name);
 			$s.data('code', def.code);
-			child1.append($s);
+			child1.P($s);
 			$li.data('code', def.code);
-			$li.data('index', child2.children().length);
-			child2.append($li.append(_h.join('')));
+			$li.data('index', child2.C().length);
+			child2.P($li.P(_h.join('')));
 			if (!!def.data && def.data.length) {
-				child1.append(defaults.split);
+				child1.P(defaults.split);
 				_initDefault(child1, child2, def.data[0]);
 			}
 		}
 
 		function _initContent(selector, source) {
 			var $ul = $.create('ul');
-			$ul.data('index', selector.children().length);
+			$ul.data('index', selector.C().length);
 			$.each(source, function(i, item) {
 				var $li = $.create('li'),
 					_h = ['<a href="javascript:">', item.name, '</a>'];
-				$li.append(_h.join(''));
-				if (i == 0) $li.addClass('selected');
+				$li.P(_h.join(''));
+				if (i === 0) $li.A('selected');
 				$li.data('code', item.code);
-				$ul.append($li);
+				$ul.P($li);
 			});
-			selector.append($ul);
+			selector.P($ul);
 			if (!!source[0].data && source[0].data.length) {
 				_initContent(selector, source[0].data);
 			}
@@ -115,11 +123,11 @@
 			options = this.options;
 		$.get(options.url).done(function(data) {
 			if (typeof data == "string") data = eval("(" + data + ")");
-			if (data.flag != void 0 && (data.flag == "true" || data.flag == true)) {
+			if (data.flag != void 0 && (data.flag == "true" || data.flag === true)) {
 				options.data = data.data;
 				_init(selector, options.data);
 			} else
-				console.log('Request error:please check the network and make sure the url is correct.')
+				console.log('Request error:please check the network and make sure the url is correct.');
 			dtd.resolve();
 		});
 		return dtd.promise();
@@ -128,45 +136,53 @@
 	function _bindEvents(selector) {
 		//点击弹出(隐藏)选择部分
 		var _self = this,
-			_click = 'click',
+			_click = 'mousedown',
 			_expand = 'expand',
-			$head = _self.selector.children();
+			$head = selector.C();
 		_eventHandler($head.eq(0), _click, _ctrlClick);
 		//点击切换区域选项
-		var $ctrl = $head.eq(1).children();
+		var $ctrl = $head.eq(1).C();
 		_eventHandler($ctrl.eq(0).find('li'), _click, _tabsClick);
 		//点击选择具体的区域
 		var $lis = $ctrl.eq(1).find('li');
 		_eventHandler($lis, _click, _liClick)
 
-		function _ctrlClick() {
+		_eventHandler($head.eq(1), _click, function(e) {
+			e.stopPropagation();
+		});
+
+		_eventHandler($(d), _click, _bodyClick);
+
+		function _ctrlClick(e) {
 			var $e = $('.' + _expand + '.' + _sClass),
 				$p = $(this).parent();
 			if ($p.hasClass(_expand)) {
-				$p.removeClass(_expand);
+				$p.R(_expand);
 			} else {
 				if ($e.length)
-					$e.removeClass(_expand);
-				$p.addClass(_expand);
+					$e.R(_expand);
+				$p.A(_expand);
 			}
+			e.stopPropagation();
 		}
 
-		function _tabsClick() {
-			$ctrl.find('li.active').removeClass('active');
+		function _tabsClick(e) {
+			$ctrl.find('li.active').R('active');
 			var _index = $(this).data('index'),
 				$all = $(this).parent().next().find('ul');
 			$(this).toggleClass('active');
 			$all.hide();
 			$all.eq(_index).show();
+			e.stopPropagation();
 		}
 
-		function _liClick() {
+		function _liClick(e) {
 			var $parent = $(this).parent(),
 				_index = $parent.data('index'),
 				_len = _self.selectedCodes.length,
 				_currentCode = $(this).data('code');
-			$parent.children().removeClass('selected');
-			$(this).addClass('selected');
+			$parent.C().R('selected');
+			$(this).A('selected');
 
 			//保存当前选择区域编码
 			if (_len > _index)
@@ -183,20 +199,28 @@
 			_self.options.onSelect(_currentCode);
 
 			//切换至下一个选项
-			var $tab = $parent.parent().prev().children().eq(_index);
+			var $tab = $parent.parent().prev().C().eq(_index);
 			$tab.find('span').text($(this).text());
-			if ($tab.next().length) $tab.next().click();
+			if ($tab.next().length) $tab.next().mousedown();
 			else {
 				var vArr = $.trim($ctrl.eq(0).text()).split(' ');
 				$.each($head.eq(0).find('span'), function(i, elm) {
 					$(elm).text(vArr[i]);
 				});
 				//末个选项点击后触发关闭
-				$head.click();
+				$head.mousedown();
 				//回调自定义关闭事件
 				_self.options.onClose(_self.selectedCodes);
 			}
-		};
+			e.stopPropagation();
+		}
+
+		function _bodyClick(evt) {
+			var _target = evt.srcElement || evt.target;
+			console.log(_target);
+			if (selector.hasClass(_expand) && _target != selector[0])
+				selector.R(_expand);
+		}
 	}
 
 	function _eventHandler(selector, type, fn) {
@@ -204,6 +228,6 @@
 	}
 
 	$.create = function(elm, className) {
-		return $(document.createElement(elm)).addClass(className);
-	}
+		return $(d.createElement(elm)).A(className);
+	};
 })(jQuery, window);
