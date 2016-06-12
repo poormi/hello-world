@@ -217,7 +217,6 @@
 
 		function _bodyClick(evt) {
 			var _target = evt.srcElement || evt.target;
-			console.log(_target);
 			if (selector.hasClass(_expand) && _target != selector[0])
 				selector.R(_expand);
 		}
