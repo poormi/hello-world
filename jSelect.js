@@ -36,7 +36,7 @@
 			that.selectedCodes = [];
 			//优先使用设置的data属性
 			if (options.data.length) {
-				_init(selector, options.data);
+				_init.call(that, selector, options.data);
 				_bindEvents.call(that, selector);
 				options.onLoad();
 			} else {
@@ -62,7 +62,8 @@
 
 	function _init(selector, source) {
 		var $v = $.create('div', 'select-data'),
-			data = source;
+			data = source,
+			options = this.options;
 		selector.P($v);
 		if (data.length) {
 			var $w = $.create('div', 'select-wrap clear'),
@@ -102,7 +103,7 @@
 				child2.P($li.P(_h.join('')));
 			}
 			if (!!def.data && def.data.length) {
-				child1.P(defaults.split);
+				child1.P(options.split);
 				_initDefault(child1, child2, def.data[0]);
 			}
 		}
@@ -127,12 +128,13 @@
 
 	function _request(selector) {
 		var dtd = $.Deferred(),
-			options = this.options;
+			_self = this,
+			options = _self.options;
 		$.get(options.url).done(function(data) {
 			if (typeof data == "string") data = eval("(" + data + ")");
 			if (data.flag != void 0 && (data.flag == "true" || data.flag === true)) {
 				options.data = data.data;
-				_init(selector, options.data);
+				_init.call(_self, selector, options.data);
 			} else
 				console.log('Request error:please check the network and make sure the url is correct.');
 			dtd.resolve();
