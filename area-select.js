@@ -66,14 +66,19 @@
 		selector.P($v);
 		if (data.length) {
 			var $w = $.create('div', 'select-wrap clear'),
+				$u = [];
+			if (!!data[0].data) {
 				$u = $.create('ul', 'select-tabs');
-			selector.P($w.P($u));
+				$w.P($u);
+			}
+			selector.P($w);
 
 			//初始化结果区域（默认第一条数据）
 			var def = data[0];
 			_initDefault($v, $u, def);
 			//默认首个选项激活状态
-			$u.C().eq(0).A('active');
+			if ($u.length)
+				$u.C().eq(0).A('active');
 
 			//初始化展开的选择区域
 			var $c = $.create('div', 'select-content clear');
@@ -91,9 +96,11 @@
 			$s.html(def.name);
 			$s.data('code', def.code);
 			child1.P($s);
-			$li.data('code', def.code);
-			$li.data('index', child2.C().length);
-			child2.P($li.P(_h.join('')));
+			if (child2.length) {
+				$li.data('code', def.code);
+				$li.data('index', child2.C().length);
+				child2.P($li.P(_h.join('')));
+			}
 			if (!!def.data && def.data.length) {
 				child1.P(defaults.split);
 				_initDefault(child1, child2, def.data[0]);
@@ -141,8 +148,12 @@
 			$head = selector.C();
 		_eventHandler($head.eq(0), _click, _ctrlClick);
 		//点击切换区域选项
-		var $ctrl = $head.eq(1).C();
-		_eventHandler($ctrl.eq(0).find('li'), _click, _tabsClick);
+		var $ctrl = $head.eq(1).C(),
+			$tabs = $ctrl.eq(0).find('li');
+		if ($ctrl.length == 1) {
+			_tabsClick = _liClick;
+		}
+		_eventHandler($tabs, _click, _tabsClick);
 		//点击选择具体的区域
 		var $lis = $ctrl.eq(1).find('li');
 		_eventHandler($lis, _click, _liClick)
@@ -198,20 +209,32 @@
 			//回调自定义点击事件
 			_self.options.onSelect(_currentCode);
 
-			//切换至下一个选项
-			var $tab = $parent.parent().prev().C().eq(_index);
-			$tab.find('span').text($(this).text());
-			if ($tab.next().length) $tab.next().mousedown();
-			else {
-				var vArr = $.trim($ctrl.eq(0).text()).split(' ');
-				$.each($head.eq(0).find('span'), function(i, elm) {
-					$(elm).text(vArr[i]);
-				});
+
+			//选项不存在,直接设置span
+			if ($ctrl.length == 1) {
+				$head.eq(0).find('span').text($(this).text());
+			} else {
+				//设置选项显示文本内容
+				var $tab = $parent.parent().prev().C().eq(_index);
+				$tab.find('span').text($(this).text());
+				//切换至下一个选项
+				if ($tab.next().length) $tab.next().mousedown();
+				else {
+					//获取选项内容 设置到主显示文本框上
+					var vArr = $.trim($ctrl.eq(0).text()).split(' ');
+					$.each($head.eq(0).find('span'), function(i, elm) {
+						$(elm).text(vArr[i]);
+					});
+				}
+			}
+
+			if (!$parent.next().length) {
 				//末个选项点击后触发关闭
 				$head.mousedown();
 				//回调自定义关闭事件
 				_self.options.onClose(_self.selectedCodes);
 			}
+
 			e.stopPropagation();
 		}
 
