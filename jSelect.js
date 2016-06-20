@@ -166,7 +166,7 @@
 
 		_eventHandler($(d), _click, _bodyClick);
 
-		function _ctrlClick(e) {
+		function _ctrlClick() {
 			var $e = $('.' + _expand + '.' + _sClass),
 				$p = $(this).parent();
 			if ($p.hasClass(_expand)) {
@@ -176,7 +176,6 @@
 					$e.R(_expand);
 				$p.A(_expand);
 			}
-			e.stopPropagation();
 		}
 
 		function _tabsClick(e) {
@@ -242,7 +241,7 @@
 
 		function _bodyClick(evt) {
 			var _target = evt.srcElement || evt.target;
-			if (selector.hasClass(_expand) && _target != selector[0])
+			if (selector.hasClass(_expand) && _target.parentElement.parentElement != selector[0])
 				selector.R(_expand);
 		}
 	}
