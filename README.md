@@ -11,7 +11,7 @@ tab：
 ECode.Wdate:
 >月份选择，支持设置最大最小时间或设置其他月份控件的值
 >使用方法: 
-ECode.Wdate({
+>>ECode.Wdate({
 	maxDate: '2016-06',
     minDate: $('#monthStart')
 });
