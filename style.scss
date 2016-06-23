@@ -1,0 +1,44 @@
+
+.t-title{
+	z-index: 10;
+	position:absolute;
+	display: none;
+	padding: 10px;
+	max-width: 160px;
+	background-color: #000;
+	color:#FFF;
+	opacity: 0.6;
+	word-wrap: break-word;
+}
+.t-tips{
+	position: absolute;
+	display: none;
+	padding: 10px;
+	margin-left: 10px;
+	max-width: 140px;
+	background-color:#FFF;
+	border: solid 1px #7eba56;
+	line-height: 2;
+	text-align: left;
+	.t-arrow-tb{
+		position:absolute;top: 50%;left: -20px;margin-top:-10px;z-index:2;
+		.t-arrow-c,.t-arrow{
+			position: absolute;
+		    left: 0;
+		    top: 0;
+		    z-index: 5;
+		    border: 10px transparent dashed;
+		    border-right: 10px #FFF solid;
+		    overflow: hidden;
+		}
+		.t-arrow-c{
+			border-right-color: #7eba56;
+		}
+		.t-arrow{left:1px;}
+	}/*左三角箭头垂直居中*/
+	.left-arrow1{border-right-color:#7eba56;}
+	&.warning{
+		border-color: $orange;
+		.t-arrow-c{border-right-color: $orange;}
+	}
+}
